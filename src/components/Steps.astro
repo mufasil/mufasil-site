@@ -1,0 +1,12 @@
+---
+import { startSteps } from "../data/services";
+---
+<ol class="steps">
+  {startSteps.map((s, i) => (
+    <li class="step" data-reveal>
+      <span class="step__num">{i + 1}</span>
+      <h3>{s.title}</h3>
+      <p>{s.text}</p>
+    </li>
+  ))}
+</ol>

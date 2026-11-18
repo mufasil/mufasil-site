@@ -1,0 +1,21 @@
+import puppeteer from "puppeteer-core";
+const [url, dir] = process.argv.slice(2);
+const b = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true });
+const p = await b.newPage();
+await p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
+await p.goto(url, { waitUntil: "networkidle0" });
+await new Promise((r) => setTimeout(r, 1600));
+
+await new Promise((r) => setTimeout(r, 600));
+const box = await (await p.$(".doors")).boundingBox();
+const clip = { x: box.x - 30, y: box.y - 30, width: box.width + 60, height: box.height + 60 };
+await p.screenshot({ path: `${dir}/doors.png`, clip });
+await p.hover(".door:nth-child(2)");
+await new Promise((r) => setTimeout(r, 1000));
+await p.screenshot({ path: `${dir}/doors-hover.png`, clip });
+await p.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+await p.goto(url, { waitUntil: "networkidle0" });
+await new Promise((r) => setTimeout(r, 1500));
+const m = await p.$(".doors");
+await m.screenshot({ path: `${dir}/doors-m.png` });
+await b.close();

@@ -1,0 +1,36 @@
+---
+// The top of every inner page: breadcrumb, kicker, a heading with an optional serif accent,
+// a lead, anything passed as children (actions, facts), and an optional visual on the right.
+interface Crumb { href?: string; label: string }
+interface Props {
+  kicker?: string;
+  title: string;
+  accent?: string;
+  after?: string;
+  lead?: string;
+  crumbs?: Crumb[];
+  size?: "lg" | "md";
+}
+const { kicker, title, accent, after = "", lead, crumbs, size = "lg" } = Astro.props;
+const split = Astro.slots.has("aside");
+---
+<section class:list={["phero", `phero--${size}`, split && "phero--split"]}>
+  <div class="wrap phero__grid">
+    <div class="phero__copy" data-hero style="--d:0s">
+      {crumbs && (
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <ol>
+            {crumbs.map((c) => (
+              <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>
+            ))}
+          </ol>
+        </nav>
+      )}
+      {kicker && <p class="kicker">{kicker}</p>}
+      <h1>{title}{accent && <> <em>{accent}</em></>}{after}</h1>
+      {lead && <p class="lead">{lead}</p>}
+      <slot />
+    </div>
+    {split && <div class="phero__aside" data-hero style="--d:.12s"><slot name="aside" /></div>}
+  </div>
+</section>

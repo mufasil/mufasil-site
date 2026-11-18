@@ -1,0 +1,21 @@
+# /etc/systemd/system/mufasil-contact.service
+# Runs the contact form service. The SMTP key stays in /var/html/mufasil-contact/.env (chmod 600).
+[Unit]
+Description=mufasil.site contact form (Brevo SMTP)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/html/mufasil-contact
+ExecStart=/usr/bin/node --env-file=/var/html/mufasil-contact/.env contact.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

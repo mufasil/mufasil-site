@@ -1,0 +1,99 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { SITE } from "../../consts";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import ContactCta from "../../components/ContactCta.astro";
+import { lookFor } from "../../data/cases";
+
+export async function getStaticPaths() {
+  const cases = await getCollection("work");
+  return cases.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const look = lookFor(entry.id);
+const others = (await getCollection("work")).filter((c) => c.id !== entry.id).sort((a, b) => a.data.order - b.data.order);
+const url = `${SITE.url}/work/${entry.id}/`;
+
+const schema = [
+  {
+    "@type": "Article",
+    "@id": `${url}#article`,
+    headline: entry.data.title,
+    description: entry.data.description,
+    url,
+    author: { "@id": `${SITE.url}/#person` },
+    publisher: { "@id": `${SITE.url}/#person` },
+    about: entry.data.client,
+    keywords: entry.data.stack.join(", "),
+    image: `${SITE.url}/og/work-${entry.id}.png`,
+    inLanguage: "en",
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/` },
+      { "@type": "ListItem", position: 2, name: "Work", item: `${SITE.url}/work/` },
+      { "@type": "ListItem", position: 3, name: entry.data.title, item: url },
+    ],
+  },
+];
+---
+<Base title={entry.data.title} description={entry.data.description} type="article" schema={schema}>
+  <PageHero size="md" crumbs={[{ href: "/", label: "Home" }, { href: "/work/", label: "Work" }, { label: entry.data.client }]} title={entry.data.title} lead={entry.data.description}>
+    <div class={`metric metric--${look.tone}`} slot="aside">
+      <b>{look.value}</b>
+      <span>{look.label}</span>
+    </div>
+  </PageHero>
+
+  <section class="wrap">
+    <dl class="factbar" data-reveal>
+      <div><dt>For</dt><dd>{entry.data.client}</dd></div>
+      <div><dt>Years</dt><dd>{entry.data.years}</dd></div>
+      <div><dt>My role</dt><dd>{entry.data.role}</dd></div>
+    </dl>
+  </section>
+
+  <div class="wrap article">
+    <article class="prose">
+      <Content />
+    </article>
+    <aside class="aside card" aria-label="Project stack">
+      <p class="aside__label">Stack and practice</p>
+      <ul class="tags">{entry.data.stack.map((s) => <li>{s}</li>)}</ul>
+      <hr />
+      <p class="aside__title">Have a project like this?</p>
+      <p>Send me what you’re building and where it hurts. I reply by email.</p>
+      <a class="btn btn--pill btn--primary" href="/contact/?type=contract">Talk about your project <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+    </aside>
+  </div>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">More work</p>
+        <h2>Other case studies</h2>
+      </div>
+      <div class="next">
+        {others.map((c) => {
+          const l = lookFor(c.id);
+          return (
+            <a class={`next__card case--${l.tone}`} href={`/work/${c.id}/`} data-reveal>
+              <p class="case__meta">{c.data.client}, {c.data.years}</p>
+              <h3>{c.data.title}</h3>
+              <div class="next__foot"><b>{l.value}</b><span class="case__arrow"><Icon name="arrowUpRight" size={18} /></span></div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap"><ContactCta /></div>
+  </section>
+</Base>

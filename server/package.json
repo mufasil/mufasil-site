@@ -1,0 +1,15 @@
+{
+  "name": "mufasil-contact",
+  "private": true,
+  "type": "module",
+  "description": "Receives the mufasil.site contact form and emails it through Brevo SMTP.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node --env-file=.env contact.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "10.3.1"
+  }
+}

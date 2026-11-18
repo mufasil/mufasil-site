@@ -1,0 +1,203 @@
+---
+import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
+import ContactCta from "../../components/ContactCta.astro";
+import PageHero from "../../components/PageHero.astro";
+import Steps from "../../components/Steps.astro";
+import { servicePages, serviceHref } from "../../data/servicePages";
+import { SITE } from "../../consts";
+
+const services = [
+  {
+    name: "Production readiness review",
+    icon: "shieldCheck",
+    for: "An app built fast, often with AI, that’s about to get real users.",
+    covers: ["Secrets and keys", "Auth on every route", "Rate limits", "A tested restore", "Scoped IAM", "Error alerts"],
+    result: "A list of what to fix, ordered by risk. I can make the fixes too.",
+  },
+  {
+    name: "Node.js backend performance",
+    icon: "gauge",
+    for: "An API that slows down as traffic or data grows.",
+    covers: ["Event loop", "Indexes", "N+1 queries", "Redis caching", "Connection pools"],
+    result: "I measure before and after, so you can see what each change actually did.",
+  },
+  {
+    name: "AWS architecture and cost",
+    icon: "cloud",
+    for: "An AWS bill that keeps climbing, or a setup nobody really planned.",
+    covers: ["NAT Gateways", "Data transfer", "Right-sizing", "Log retention", "Budgets"],
+    result: "A list of changes ranked by how much they save, with nothing that puts uptime at risk.",
+  },
+  {
+    name: "Part-time technical lead",
+    icon: "users",
+    for: "A team without a senior lead, or one that keeps missing dates.",
+    covers: ["Planning", "Code review", "Release rhythm", "AI in the workflow", "Mentoring"],
+    result: "I’ve led a team of 19+, and I’d work with yours on planning and reviews.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Do you work with teams outside Pakistan?",
+    a: "Yes, remotely. I’ve worked with a team in Riyadh. Karachi is UTC+5, which gives me a few hours of overlap with Europe in my afternoon and with the US East Coast in my evening.",
+  },
+  {
+    q: "Which stacks do you work in?",
+    a: "Mostly Node.js with NestJS, Express and Next.js, on PostgreSQL, MongoDB and Redis, deployed on AWS. I also work in Laravel, PHP and Python.",
+  },
+  {
+    q: "Can you work on code an AI tool wrote?",
+    a: "Yes. A lot of what I’m asked about now started that way. I use Claude and GPT every day, so I know where generated code tends to cut corners.",
+  },
+];
+
+const schema = [
+  {
+    "@type": "ProfessionalService",
+    "@id": `${SITE.url}/services/#service`,
+    name: "Mufasil Iqbal, backend engineering and technical leadership",
+    url: `${SITE.url}/services/`,
+    provider: { "@id": `${SITE.url}/#person` },
+    areaServed: "Worldwide",
+    address: { "@type": "PostalAddress", addressLocality: SITE.city, addressCountry: "PK" },
+    email: SITE.email,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Services",
+      itemListElement: services.map((s) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: s.name, description: s.for } })),
+    },
+  },
+  { "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+];
+
+const ways = [
+  { icon: "briefcase", title: "Full-time remote", text: "Senior Backend Engineer, Tech Lead or Engineering Manager on a product team.", cta: "Ask about a role", href: "/contact/?type=role" },
+  { icon: "code", title: "Contract", text: "Backend builds and fixes in Node.js, NestJS and Next.js, and taking AI-built apps to production.", cta: "Start a contract", href: "/contact/?type=contract" },
+  { icon: "layers", title: "Consulting", text: "One of the four engagements below, scoped to what your team needs.", cta: "Ask for a review", href: "/contact/?type=consulting" },
+];
+
+
+---
+<Base
+  title="Hire a Senior Node.js Backend Engineer or Tech Lead"
+  description="Hire Mufasil Iqbal for a remote backend or tech lead role, a contract, or consulting on Node.js, NestJS, Next.js and AWS. Based in Karachi, UTC+5."
+  schema={schema}
+>
+  <PageHero kicker="Hire me" title="Ways to" accent="work together" lead="You can hire me full-time, on a contract, or for a short consulting job. The work is mostly Node.js, NestJS, Next.js and AWS.">
+    <div class="phero__actions">
+      <a class="btn btn--pill btn--dark" href="/contact/">Start a conversation <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+      <a class="btn" href={SITE.cv} download><Icon name="download" size={18} />Download CV</a>
+    </div>
+    <div class="avail" slot="aside">
+      {SITE.openToWork && <p class="avail__status"><span class="door__pulse" aria-hidden="true"></span>Open to new work</p>}
+      <ul class="avail__list">
+        <li><Icon name="check" size={16} />Full-time remote roles</li>
+        <li><Icon name="check" size={16} />Contracts</li>
+        <li><Icon name="check" size={16} />Consulting and reviews</li>
+      </ul>
+      <div class="avail__time">
+        <Icon name="clock" size={18} />
+        <div><b data-clock="short">Karachi, UTC+5</b><small>A few hours of overlap with Europe in my afternoon, and with the US East Coast in my evening.</small></div>
+      </div>
+    </div>
+  </PageHero>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      <h2 class="visually-hidden">How you can hire me</h2>
+      <div class="ways">
+        {ways.map((w, i) => (
+          <a class="way" href={w.href} data-reveal>
+            <div class="way__top">
+              <span class="glossy"><Icon name={w.icon} size={22} stroke={1.75} /></span>
+              <span class="way__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3>{w.title}</h3>
+            <p>{w.text}</p>
+            <span class="way__cta">{w.cta} <Icon name="arrowRight" size={16} /></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Consulting</p>
+        <h2>Four kinds of work I take on</h2>
+      </div>
+      <div class="offers">
+        {services.map((s) => (
+          <a class="offer" href={serviceHref(s.name)} data-reveal>
+            <div class="offer__top">
+              <span class="glossy"><Icon name={s.icon} size={22} stroke={1.75} /></span>
+              <h3>{s.name}</h3>
+              <Icon name="arrowUpRight" size={18} class="offer__go" />
+            </div>
+            <p class="offer__for"><span>Good for</span>{s.for}</p>
+            <ul class="tags" aria-label={`What ${s.name.toLowerCase()} covers`}>{s.covers.map((c) => <li>{c}</li>)}</ul>
+            <p class="offer__result"><Icon name="check" size={16} />{s.result}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Every service</p>
+        <h2>Find the one you need</h2>
+        <p>Each has its own page with who it’s for, what the work covers and where I’ve done it before.</p>
+      </div>
+      <div class="directory">
+        {[
+          { key: "core", title: "Core areas" },
+          { key: "build", title: "Build" },
+          { key: "optimise", title: "Optimise" },
+        ].map((g) => (
+          <div class="directory__col" data-reveal>
+            <p class="directory__label">{g.title}</p>
+            {servicePages.filter((s) => s.group === g.key).map((s) => (
+              <a class="directory__link" href={`/services/${s.slug}/`}><Icon name={s.icon} size={18} />{s.name}<Icon name="arrowRight" size={16} class="directory__go" /></a>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Process</p>
+        <h2>How it starts</h2>
+      </div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <div class="split__head" data-reveal>
+        <p class="kicker">Questions</p>
+        <h2>Questions people ask first</h2>
+      </div>
+      <div class="faq">
+        {faqs.map((f, i) => (
+          <details class="faq__item" open={i === 0} data-reveal>
+            <summary><h3>{f.q}</h3><span class="faq__icon" aria-hidden="true"><Icon name="plus" size={18} /></span></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap"><ContactCta /></div>
+  </section>
+</Base>

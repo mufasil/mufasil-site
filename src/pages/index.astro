@@ -1,0 +1,359 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import CodeWindow from "../components/CodeWindow.astro";
+import cutout from "../assets/mufasil-cutout.png";
+import * as brandIcons from "simple-icons";
+import { experience } from "../data/experience";
+import { lookFor } from "../data/cases";
+import Portrait from "../components/Portrait.astro";
+import { serviceGroups, reasons } from "../data/services";
+import { serviceHref } from "../data/servicePages";
+import { testimonials, recommendationCount } from "../data/testimonials";
+import { SITE, yearsBuilding } from "../consts";
+
+const years = yearsBuilding();
+const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+const cases = (await getCollection("work")).sort((a, b) => a.data.order - b.data.order);
+const fmt = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+
+
+const brands = ["Social Champ", "Digital Auxilius", "Get Licensed", "Appiskey", "Zido", "Perfect Day Care", "Hilal Foods", "Getz Pharma", "Jubilee Insurance", "Storm Fiber", "Lakson Business Solutions", "Interactive Cells"];
+// Stack tiles that float around the photo. Brand colours come from simple-icons; AWS is a wordmark.
+const brandHex = (key: string) => `#${(brandIcons as Record<string, { hex: string }>)[key].hex}`;
+const tiles = [
+  { name: "Node.js", icon: "nodedotjs", color: brandHex("siNodedotjs"), slot: "a", depth: 1 },
+  { name: "AWS", icon: "", color: "#ff9900", slot: "b", depth: 1.3 },
+  { name: "PostgreSQL", icon: "postgresql", color: brandHex("siPostgresql"), slot: "c", depth: 0.7 },
+  { name: "Redis", icon: "redis", color: brandHex("siRedis"), slot: "d", depth: 0.8 },
+  { name: "NestJS", icon: "nestjs", color: brandHex("siNestjs"), slot: "e", depth: 1.2 },
+  { name: "Docker", icon: "docker", color: brandHex("siDocker"), slot: "f", depth: 0.9 },
+];
+const initials = (name: string) => name.split(" ").map((p) => p[0]).slice(0, 2).join("");
+import Logo from "../components/Logo.astro";
+---
+<Base title={SITE.title} description={SITE.description} type="profile">
+  <section class="hero" aria-labelledby="hero-title" data-anim-zone>
+    <div class="hero__stage">
+      <Portrait class="hero__figure">
+        <ul class="tiles" aria-label="Core stack">
+          {tiles.map((tile, i) => (
+            <li class={`tile tile--${tile.slot}`} style={`--brand:${tile.color};--depth:${tile.depth};--float:${5.5 + i * 0.7}s;--fd:${-i * 1.3}s`} title={tile.name}>
+              {tile.icon ? <Icon name={tile.icon} size={26} label={tile.name} /> : <span class="tile__word" aria-label={tile.name}>aws</span>}
+            </li>
+          ))}
+        </ul>
+      </Portrait>
+      <div class="hero__chip hero__chip--left">
+        <span class="mega__icon"><Icon name="briefcase" size={18} /></span>
+        <span><b>Technical Team Lead</b><small>at Social Champ</small></span>
+      </div>
+      <a class="hero__chip hero__chip--right" href={SITE.credly}>
+        <span class="mega__icon"><Icon name="award" size={18} /></span>
+        <span><b>AWS Certified</b><small>Solutions Architect</small></span>
+      </a>
+    </div>
+
+    <div class="hero__copy">
+      <p class="hello" data-hero style="--d:.08s"><span class="hello__dot" aria-hidden="true"><Logo withName={false} /></span>Hi, I’m <b>Mufasil Iqbal</b></p>
+      <h1 id="hero-title" data-hero style="--d:.16s">Backend engineer and tech lead helping products <em>ship and scale</em></h1>
+      <p class="hero__lead" data-hero style="--d:.24s">{years}+ years building Node.js, NestJS and AWS backends. Today I lead an AI-first engineering team at Social Champ.</p>
+    </div>
+
+    <div class="wrap">
+      <nav class="doors" aria-label="Ways to work with me" data-hero style="--d:.32s">
+        <a class="door door--primary" href="/contact/?type=role">
+          <span class="door__icon"><Icon name="briefcase" size={22} stroke={1.75} /></span>
+          <span class="door__body">
+            {SITE.openToWork && <span class="door__status"><span class="door__pulse" aria-hidden="true"></span>Open to remote roles</span>}
+            <b>Hire me full-time</b>
+            <small>Senior Backend, Tech Lead, EM</small>
+          </span>
+          <span class="door__arrow" aria-hidden="true"><Icon name="arrowUpRight" size={18} /></span>
+        </a>
+        <a class="door" href="/contact/?type=contract">
+          <span class="door__icon"><Icon name="code" size={22} stroke={1.75} /></span>
+          <span class="door__body">
+            <span class="door__status">Freelance or consulting</span>
+            <b>Start a contract</b>
+            <small>Node.js, AWS, AI-built apps</small>
+          </span>
+          <span class="door__arrow" aria-hidden="true"><Icon name="arrowUpRight" size={18} /></span>
+        </a>
+        <a class="door" href={SITE.cv} download>
+          <span class="door__icon"><Icon name="download" size={22} stroke={1.75} /></span>
+          <span class="door__body">
+            <span class="door__status">2-page PDF</span>
+            <b>Download my CV</b>
+            <small>Updated November 2026</small>
+          </span>
+          <span class="door__arrow door__arrow--down" aria-hidden="true"><Icon name="arrowRight" size={18} /></span>
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="trusted" aria-label="Teams and brands I have built for" data-anim-zone>
+    <div class="wrap"><p class="trusted__label">Teams and brands I’ve built for</p></div>
+    <div class="marquee">
+      <div class="marquee__track">
+        {[...brands, ...brands].map((b, i) => <span aria-hidden={i >= brands.length ? "true" : undefined}>{b}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section intro" data-anim-zone>
+    <div class="wrap">
+      <div class="intro__grid">
+        <div class="seal" data-reveal>
+          <span class="seal__icon"><Icon name="sparkles" size={28} /></span>
+          <span>Backends since 2014,<br />with AI in the loop</span>
+        </div>
+        <p class="intro__text" data-reveal>
+          Since 2014 I’ve built backends in
+          <span class="inline-chip"><Icon name="nodedotjs" size={18} />Node.js</span>, PHP and Python.
+          Today I lead an AI-first team where
+          <span class="inline-chip"><Icon name="sparkles" size={18} />AI writes the boilerplate</span>
+          and engineers own
+          <span class="inline-chip"><Icon name="layers" size={18} />the architecture</span>.
+          We ship faster, and every line still gets reviewed.
+        </p>
+      </div>
+      <div class="stats">
+        <div class="stat" data-reveal><p>Years shipping backends, since December 2014</p><b data-count={`${years}+`}>{years}+</b></div>
+        <div class="stat" data-reveal><p>Engineers led on one cross-functional team</p><b data-count="19+">19+</b></div>
+        <div class="stat" data-reveal><p>To ship a product that was running 1.5 years late</p><b data-count="4 mo">4 mo</b></div>
+        <div class="stat" data-reveal><p>Faster response times, at best, on a multi-tenant SaaS</p><b data-count="40%">40%</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="gem" aria-hidden="true" data-reveal><span></span><span></span><span></span></div>
+      <div class="section__head section__head--center" data-reveal>
+        <p class="kicker">What I do</p>
+        <h2>Backend work I take on</h2>
+      </div>
+      <div class="services">
+        {serviceGroups.map((g) => (
+          <div class="service" data-reveal>
+            <div class="service__head">
+              <h3>{g.title}</h3>
+              <span class="service__icons"><span><Icon name="arrowUpRight" size={16} /></span><span><Icon name={g.icon} size={16} /></span></span>
+            </div>
+            <ul class="service__list">
+              {g.items.map((item) => <li><a href={serviceHref(item)}>{item}<Icon name="arrowRight" size={16} /></a></li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" id="work">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Selected work</p>
+        <h2>Problems I’ve solved</h2>
+        <p>Three projects, with the main number from each.</p>
+      </div>
+      <div class="cases-stack">
+        {cases.map((c, i) => {
+          const look = lookFor(c.id);
+          return (
+            <a class:list={["stack-card", `stack-card--${look.tone}`]} href={`/work/${c.id}/`} data-stack-card>
+              <div class="stack-card__body">
+                <span class="stack-card__count">{String(i + 1).padStart(2, "0")} / {String(cases.length).padStart(2, "0")}</span>
+                <h3>{c.data.title}</h3>
+                <ul class="tags"><li>{c.data.client}</li><li>{c.data.years}</li>{c.data.stack.slice(0, 2).map((s) => <li>{s}</li>)}</ul>
+                <p>{c.data.description}</p>
+                <span class="btn btn--pill btn--dark">View case study <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></span>
+              </div>
+              <div class="stack-card__metric"><b>{look.value}</b><span>{look.label}</span></div>
+            </a>
+          );
+        })}
+      </div>
+      <p class="section__foot"><a class="link-arrow" href="/work/">See all projects <Icon name="arrowRight" size={16} /></a></p>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap ai">
+      <div data-reveal>
+        <div class="section__head" style="margin-bottom:0">
+          <p class="kicker">How I work</p>
+          <h2>I use AI every day, and I still review what it writes</h2>
+          <p>At Social Champ I brought in a rule we call No Code by Developer. AI does the scaffolding and the repetitive code. Architecture and review stay with the engineers.</p>
+        </div>
+        <ul class="ai__points">
+          <li><span class="ai__num">1</span><span><b>Faster delivery</b>Claude and GPT help from the first draft through to deployment.</span></li>
+          <li><span class="ai__num">2</span><span><b>Reviewed like any other code</b>Auth, tenancy, limits and error handling get checked before anything merges.</span></li>
+          <li><span class="ai__num">3</span><span><b>Production first</b>Logging, backups, rate limits and cost alerts are part of done.</span></li>
+        </ul>
+      </div>
+      <div data-reveal><CodeWindow /></div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head section__head--center" data-reveal>
+        <p class="kicker">Why teams hire me</p>
+        <h2>Six reasons teams bring me in</h2>
+      </div>
+      <div class="reasons">
+        {reasons.map((r, i) => (
+          <div class="reason" data-reveal>
+            <div class="reason__top">
+              <span class="reason__icon"><Icon name={r.icon} size={24} stroke={1.75} /></span>
+              <span class="reason__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3>{r.title}</h3>
+            <p>{r.text}</p>
+            <ul class:list={["reason__tags", r.tags.every((tag) => tag.logo) && "reason__tags--logos"]}>
+              {r.tags.map((tag) =>
+                tag.logo && r.tags.every((x) => x.logo) ? (
+                  <li class="reason__logo" title={tag.label}><Icon name={tag.logo} size={16} label={tag.label} /></li>
+                ) : tag.clock ? (
+                  <li class="tag tag--live"><span class="tag__pulse" aria-hidden="true"></span><span data-clock="short">Karachi, UTC+5</span></li>
+                ) : (
+                  <li class:list={["tag", tag.check && "tag--check"]}>
+                    {tag.check && <Icon name="check" size={13} />}
+                    {tag.logo && <Icon name={tag.logo} size={13} />}
+                    {tag.label}
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="experience">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Experience</p>
+        <h2>Where I’ve worked</h2>
+        <p>The last five roles. The full history is on the <a href="/resume/">resume page</a>.</p>
+      </div>
+      <ol class="xp-list">
+        {experience.map((job, i) => (
+          <li class="xp-row" data-reveal>
+            <span class="xp-row__when">{job.start} to {job.end}</span>
+            <div>
+              <h3>{job.role} <span>at {job.company}</span></h3>
+              <p>{job.points[0]}</p>
+            </div>
+            {i === 0 ? <span class="xp-row__badge">Current</span> : <span></span>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section love">
+    <div class="wrap">
+      <div class="love__card" data-reveal data-carousel>
+        <p class="kicker" style="justify-content:center">Recommendations</p>
+        <h2 class="love__title">{recommendationCount} recommendations on LinkedIn</h2>
+        <div class="love__slides">
+          {testimonials.map((t, i) => (
+            <figure class:list={["love__slide", { "is-active": i === 0 }]} data-slide>
+              <blockquote>“{t.quote}”</blockquote>
+              <figcaption class="love__who">
+                <span class="love__avatar" aria-hidden="true">{initials(t.name)}</span>
+                <span><b>{t.name}</b><small>{t.role}. {t.relation}</small></span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+        <div class="love__nav">
+          <button class="icon-btn" type="button" data-prev aria-label="Previous recommendation"><Icon name="chevronLeft" size={18} /></button>
+          <div class="love__dots">{testimonials.map((_, i) => <button type="button" aria-label={`Recommendation ${i + 1}`} aria-current={i === 0 ? "true" : "false"} data-dot={i}></button>)}</div>
+          <button class="icon-btn" type="button" data-next aria-label="Next recommendation"><Icon name="chevronRight" size={18} /></button>
+        </div>
+        <p class="love__more"><a class="link-arrow" href={`${SITE.linkedin}/details/recommendations/`}>Read all of them on LinkedIn <Icon name="arrowUpRight" size={16} /></a></p>
+      </div>
+      <div class="figures">
+        <div data-reveal><b>Since 2014</b><span>Building and shipping backends</span></div>
+        <div data-reveal><b data-count="12">12</b><span>Companies I’ve worked at</span></div>
+        <div data-reveal><b>To 2028</b><span>AWS Solutions Architect certification</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band" id="writing">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Writing</p>
+        <h2>Notes from production</h2>
+        <p>Short, practical fixes for Node.js, AWS and AI-built apps.</p>
+      </div>
+      <div class="posts">
+        {posts.map((post) => (
+          <a class="card post" href={`/blog/${post.id}/`} data-reveal>
+            <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+            <h3>{post.data.title}</h3>
+            <p>{post.data.description}</p>
+            <span class="link-arrow">Read the note <Icon name="arrowRight" size={16} /></span>
+          </a>
+        ))}
+      </div>
+      <p class="section__foot"><a class="link-arrow" href="/blog/">All writing <Icon name="arrowRight" size={16} /></a></p>
+    </div>
+  </section>
+
+  <section class="finale" aria-labelledby="finale-title">
+    <div class="finale__cards" aria-hidden="true">
+      <div class="float-card" style="left:5%;top:16%;transform:rotate(-12deg)" data-float="1.2"><b>{years}+</b>years shipping backends</div>
+      <div class="float-card float-card--code" style="left:13%;top:58%;transform:rotate(8deg)" data-float="0.7">server.keepAliveTimeout<br />= 65000;</div>
+      <div class="float-card float-card--blue" style="right:6%;top:14%;transform:rotate(10deg)" data-float="1.4"><b>AWS</b>Certified Solutions Architect</div>
+      <div class="float-card" style="right:12%;top:60%;transform:rotate(-7deg)" data-float="0.9"><b>19+</b>engineers led</div>
+      <div class="float-card" style="left:30%;top:4%;transform:rotate(5deg)" data-float="0.5"><b>4 mo</b>to ship a late product</div>
+    </div>
+    <div class="wrap">
+      <h2 id="finale-title" data-reveal>Ready to talk about your role or project?</h2>
+      <p data-reveal>Tell me what you’re hiring for or building. I reply by email.</p>
+      <div class="finale__actions" data-reveal>
+        <a class="btn btn--pill btn--primary" href="/contact/" data-magnetic>Get in touch <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+        <a class="btn" href={SITE.cv} download><Icon name="download" size={18} />Download CV</a>
+        <button class="btn" type="button" data-copy={SITE.email}><Icon name="copy" size={16} /><span data-copy-label>Copy email</span></button>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Recommendations carousel: auto-advances, pauses on hover and focus, and stops for reduced motion.
+  const box = document.querySelector<HTMLElement>("[data-carousel]");
+  if (box) {
+    const slides = Array.from(box.querySelectorAll<HTMLElement>("[data-slide]"));
+    const dots = Array.from(box.querySelectorAll<HTMLButtonElement>("[data-dot]"));
+    let i = 0;
+    let timer: number | undefined;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const show = (n: number) => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => { s.classList.toggle("is-active", k === i); s.setAttribute("aria-hidden", String(k !== i)); });
+      dots.forEach((d, k) => d.setAttribute("aria-current", String(k === i)));
+    };
+    const play = () => { if (!reduce) { clearInterval(timer); timer = window.setInterval(() => show(i + 1), 6500); } };
+    const stop = () => clearInterval(timer);
+    box.querySelector("[data-prev]")?.addEventListener("click", () => { show(i - 1); play(); });
+    box.querySelector("[data-next]")?.addEventListener("click", () => { show(i + 1); play(); });
+    dots.forEach((d, k) => d.addEventListener("click", () => { show(k); play(); }));
+    box.addEventListener("pointerenter", stop);
+    box.addEventListener("pointerleave", play);
+    box.addEventListener("focusin", stop);
+    box.addEventListener("focusout", play);
+    show(0);
+    new IntersectionObserver(([e]) => (e.isIntersecting ? play() : stop())).observe(box);
+  }
+</script>

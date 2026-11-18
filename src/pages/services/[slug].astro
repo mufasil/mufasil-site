@@ -1,0 +1,189 @@
+---
+import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import ContactCta from "../../components/ContactCta.astro";
+import Steps from "../../components/Steps.astro";
+import { servicePages, serviceBySlug, groupLabel, type ServicePage } from "../../data/servicePages";
+import { SITE } from "../../consts";
+
+export function getStaticPaths() {
+  return servicePages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: ServicePage };
+const url = `${SITE.url}/services/${page.slug}/`;
+const children = (page.children ?? []).map((s) => serviceBySlug[s]).filter(Boolean);
+const related = page.related.map((s) => serviceBySlug[s]).filter(Boolean);
+const parent = servicePages.find((p) => p.children?.includes(page.slug));
+const proofHref = (href?: string) => (href === "credly" ? SITE.credly : href);
+const contactLabel = { role: "Ask about a role", contract: "Talk about a project", consulting: "Ask for a review" }[page.contact];
+
+const schema = [
+  {
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: page.name,
+    serviceType: page.name,
+    description: page.description,
+    url,
+    provider: { "@id": `${SITE.url}/#person` },
+    areaServed: "Worldwide",
+    availableChannel: { "@type": "ServiceChannel", serviceUrl: `${SITE.url}/contact/`, availableLanguage: "English" },
+  },
+  { "@type": "FAQPage", "@id": `${url}#faq`, mainEntity: page.faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/` },
+      { "@type": "ListItem", position: 2, name: "Services", item: `${SITE.url}/services/` },
+      ...(parent ? [{ "@type": "ListItem", position: 3, name: parent.name, item: `${SITE.url}/services/${parent.slug}/` }] : []),
+      { "@type": "ListItem", position: parent ? 4 : 3, name: page.name, item: url },
+    ],
+  },
+];
+
+const crumbs = [
+  { href: "/", label: "Home" },
+  { href: "/services/", label: "Services" },
+  ...(parent ? [{ href: `/services/${parent.slug}/`, label: parent.name }] : []),
+  { label: page.name },
+];
+---
+<Base title={page.seoTitle} description={page.description} schema={schema}>
+  <PageHero crumbs={crumbs} title={page.title} accent={page.accent} after={page.after ?? ""} lead={page.lead}>
+    <div class="phero__actions">
+      <a class="btn btn--pill btn--dark" href={`/contact/?type=${page.contact}`}>{contactLabel} <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+      <a class="btn" href="/services/"><Icon name="layers" size={18} />All services</a>
+    </div>
+    <div class="svc-card" slot="aside">
+      <div class="svc-card__top">
+        <span class="glossy"><Icon name={page.icon} size={22} stroke={1.75} /></span>
+        <div><small>{groupLabel[page.group]}</small><b>{page.name}</b></div>
+      </div>
+      <p class="svc-card__label">Tools I use for this</p>
+      <ul class="tags">{page.stack.map((s) => <li>{s}</li>)}</ul>
+      {SITE.openToWork && <p class="svc-card__status"><span class="door__pulse" aria-hidden="true"></span>Taking on work now</p>}
+    </div>
+  </PageHero>
+
+  <section class="section section--tight">
+    <div class="wrap split">
+      <div class="split__head" data-reveal>
+        <p class="kicker">Is this you?</p>
+        <h2>Who this is for</h2>
+      </div>
+      <ul class="fit">
+        {page.fit.map((f) => <li data-reveal><span class="fit__icon"><Icon name="check" size={16} /></span>{f}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">The work</p>
+        <h2>{page.includesTitle}</h2>
+      </div>
+      <div class="includes">
+        {page.includes.map((item, i) => (
+          <div class="include" data-reveal>
+            <span class="include__num">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {children.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section__head" data-reveal>
+          <p class="kicker">In this area</p>
+          <h2>Services under {page.name}</h2>
+        </div>
+        <div class="svc-grid">
+          {children.map((c) => (
+            <a class="svc-link" href={`/services/${c.slug}/`} data-reveal>
+              <span class="glossy"><Icon name={c.icon} size={20} stroke={1.75} /></span>
+              <span class="svc-link__body"><b>{c.name}</b><small>{c.summary}</small></span>
+              <Icon name="arrowUpRight" size={18} class="svc-link__go" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class:list={["section", children.length > 0 && "section--band"]}>
+    <div class="wrap split">
+      <div class="split__head" data-reveal>
+        <p class="kicker">Proof</p>
+        <h2>Where I’ve done this</h2>
+        <p>From my own roles and projects. The details are on the <a href="/resume/">resume page</a>.</p>
+      </div>
+      <ul class="proof-list">
+        {page.proof.map((p) => (
+          <li data-reveal>
+            {p.href ? (
+              <a href={proofHref(p.href)}><span>{p.text}</span><Icon name="arrowUpRight" size={16} /></a>
+            ) : (
+              <span>{p.text}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class:list={["section", children.length === 0 && "section--band"]}>
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Process</p>
+        <h2>How it starts</h2>
+      </div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class:list={["section", children.length > 0 && "section--band"]}>
+    <div class="wrap split">
+      <div class="split__head" data-reveal>
+        <p class="kicker">Questions</p>
+        <h2>Before you ask</h2>
+      </div>
+      <div class="faq">
+        {page.faqs.map((f, i) => (
+          <details class="faq__item" open={i === 0} data-reveal>
+            <summary><h3>{f.q}</h3><span class="faq__icon" aria-hidden="true"><Icon name="plus" size={18} /></span></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class:list={["section", children.length === 0 && "section--band"]}>
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Related</p>
+        <h2>Often paired with</h2>
+      </div>
+      <div class="svc-grid">
+        {related.map((c) => (
+          <a class="svc-link" href={`/services/${c.slug}/`} data-reveal>
+            <span class="glossy"><Icon name={c.icon} size={20} stroke={1.75} /></span>
+            <span class="svc-link__body"><b>{c.name}</b><small>{c.summary}</small></span>
+            <Icon name="arrowUpRight" size={18} class="svc-link__go" />
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap"><ContactCta heading="Have a project like this?" text="Send me the details and where it hurts. I reply by email." /></div>
+  </section>
+</Base>

@@ -1,0 +1,30 @@
+[
+ {
+  "shape": "Conversational FAQ",
+  "theme": "cobalt",
+  "axes": "light/grotesk-sans/cool",
+  "hero": "Poster",
+  "nav": "slab",
+  "footer": "mast",
+  "imagery": "photographs, user 1 (portrait), duotone; the product built: a code mapping",
+  "photos": [],
+  "entry": "question heads over rows, an index, a graphite code mapping, a split, a changelog list, a contact close",
+  "fingerprint": "faq/poster/slab/mast/index+mapping/light-cool",
+  "sections": [
+   "Poster hero on an ASCII field",
+   "Rows: What do you fix?",
+   "Index: What have you shipped?",
+   "Mapping in a graphite band: What does a fix look like?",
+   "Split with portrait: Who will do the work?",
+   "Changelog rows: What have you written lately?",
+   "Close with contact rows"
+  ],
+  "signature": "one AI-written route handler beside the version that shipped, its three fixes numbered",
+  "waived": [
+   "49b"
+  ],
+  "prompt": "Personal website for Mufasil Iqbal, Node.js and AWS engineering lead, freelance and consulting",
+  "date": "2026-11-17",
+  "mode": "build"
+ }
+]

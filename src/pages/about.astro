@@ -1,0 +1,162 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import PageHero from "../components/PageHero.astro";
+import Portrait from "../components/Portrait.astro";
+import ContactCta from "../components/ContactCta.astro";
+import { experience, earlier, stack } from "../data/experience";
+import { testimonials, recommendationCount } from "../data/testimonials";
+import { SITE, yearsBuilding } from "../consts";
+
+const years = yearsBuilding();
+const schema = [
+  { "@type": "ProfilePage", "@id": `${SITE.url}/about/#page`, url: `${SITE.url}/about/`, name: "About Mufasil Iqbal", mainEntity: { "@id": `${SITE.url}/#person` } },
+];
+
+const numbers = [
+  { value: `${years}+`, label: "years building backends" },
+  { value: "19+", label: "engineers in the team I led" },
+  { value: String(experience.length + earlier.length), label: "companies since 2014" },
+  { value: String(recommendationCount), label: "recommendations on LinkedIn" },
+];
+
+const timeline = [
+  ...experience.map((j) => ({ when: `${j.start.slice(-4)}${j.end === "Present" ? " to now" : j.end.slice(-4) === j.start.slice(-4) ? "" : ` to ${j.end.slice(-4)}`}`, company: j.company.replace(/ (Inc\.|LLC)$/, ""), role: j.role, now: j.end === "Present" })),
+  ...earlier.map((j) => ({ when: j.years, company: j.company, role: j.role, now: false })),
+];
+
+const groupIcon: Record<string, string> = { Backend: "code", Frontend: "layers", Data: "gauge", "Cloud and DevOps": "cloud", "AI in the workflow": "sparkles" };
+const quote = testimonials[2];
+---
+<Base
+  title="About Mufasil Iqbal, Backend Engineer in Karachi"
+  description="Mufasil Iqbal is a backend engineer and Technical Team Lead in Karachi, with 11+ years of Node.js, PHP and Python. AWS Certified Solutions Architect."
+  type="profile"
+  schema={schema}
+>
+  <PageHero kicker="About" title="I build backends and" accent="lead the teams" after=" around them." lead="Software engineer since 2014. Technical Team Lead at Social Champ today.">
+    <div class="phero__actions">
+      <a class="btn btn--pill btn--primary" href={SITE.cv} download>Download CV <span class="btn__dot"><Icon name="download" size={14} /></span></a>
+      <a class="btn" href="/resume/"><Icon name="file" size={18} />View resume</a>
+    </div>
+    <ul class="facts">
+      <li><Icon name="pin" size={16} />Karachi, UTC+5</li>
+      <li><Icon name="briefcase" size={16} />Social Champ</li>
+      <li><Icon name="badgeCheck" size={16} />AWS Certified</li>
+    </ul>
+    <Portrait slot="aside" class="about-figure" sizes="(min-width: 980px) 420px, 80vw" />
+  </PageHero>
+
+  <section class="numbers" aria-label="In numbers">
+    <div class="wrap">
+      <div class="numbers__grid">
+        {numbers.map((n) => (
+          <div class="numbers__item" data-reveal>
+            <b data-count={n.value}>{n.value}</b>
+            <span>{n.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <div class="split__head" data-reveal>
+        <p class="kicker">Story</p>
+        <h2>{years}+ years, mostly on the backend</h2>
+      </div>
+      <div class="split__body">
+        <div class="prose" data-reveal>
+          <p>I’m Mufasil Iqbal. I started in December 2014 building WordPress sites and payment integrations, and I’ve spent most of the years since on the backend. Most of that has been Node.js and NestJS, with Laravel, PHP and Python along the way. The data usually lives in PostgreSQL, MySQL, MongoDB or Redis, and it runs on AWS.</p>
+          <p>Since January 2026 I’ve led the engineering team at Social Champ, a SaaS platform that brands use to manage their social accounts. We work AI-first there.</p>
+        </div>
+        <aside class="rule" data-reveal>
+          <p class="rule__label"><Icon name="sparkles" size={16} />A rule I brought in</p>
+          <h3>No Code by Developer</h3>
+          <p>AI tools write the boilerplate and the scaffolding. Engineers spend their time on the architecture and on the problems that actually need a person.</p>
+        </aside>
+        <div class="prose" data-reveal>
+          <p>Before that I led a cross-functional team of 19+ at Digital Auxilius and got a product that was a year and a half late out the door in four months. At Appiskey I managed the backend team on a multi-tenant childcare platform. Along the way I’ve built for ten industries, from healthcare and pharma to telecom and SaaS.</p>
+          <p>I use Claude and GPT every day. I can take a product from an idea to production on my own, or lead the team that does. {SITE.openToWork && "I’m now looking for a remote role or contract where I can do both."}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap split">
+      <div class="split__head split__head--sticky" data-reveal>
+        <p class="kicker">Path</p>
+        <h2>Twelve companies since 2014</h2>
+        <p>The full detail, with what I did at each, is on the <a href="/resume/">resume page</a>.</p>
+      </div>
+      <ol class="timeline">
+        {timeline.map((t) => (
+          <li class:list={["timeline__item", t.now && "is-now"]} data-reveal>
+            <span class="timeline__when">{t.when}</span>
+            <div>
+              <b>{t.company}</b>
+              <span>{t.role}</span>
+            </div>
+            {t.now && <span class="timeline__badge">Now</span>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Stack</p>
+        <h2>What I work with</h2>
+      </div>
+      <div class="bento">
+        {stack.map((g) => (
+          <div class:list={["bento__card", g.items.length > 6 && "bento__card--wide"]} data-reveal>
+            <div class="bento__top">
+              <span class="glossy"><Icon name={groupIcon[g.group] ?? "code"} size={20} stroke={1.75} /></span>
+              <h3>{g.group}</h3>
+              <span class="bento__count">{g.items.length}</span>
+            </div>
+            <ul class="logo-chips">{g.items.map((item) => <li><Icon name={item.icon} size={16} />{item.name}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Credentials</p>
+        <h2>Things you can check</h2>
+      </div>
+      <div class="proof">
+        <a class="proof__card" href={SITE.credly} data-reveal>
+          <span class="glossy"><Icon name="badgeCheck" size={22} stroke={1.75} /></span>
+          <h3>AWS Certified Solutions Architect, Associate</h3>
+          <p>Issued in September 2025, valid until September 2028.</p>
+          <span class="proof__link">Check the badge on Credly <Icon name="arrowUpRight" size={16} /></span>
+        </a>
+        <div class="proof__card" data-reveal>
+          <span class="glossy"><Icon name="graduationCap" size={22} stroke={1.75} /></span>
+          <h3>Bachelor of Computer Science</h3>
+          <p>Dadabhoy Institute of Higher Education, Karachi, 2014 to 2018.</p>
+        </div>
+        <a class="proof__card proof__card--quote" href={`${SITE.linkedin}/details/recommendations/`} data-reveal>
+          <span class="glossy"><Icon name="users" size={22} stroke={1.75} /></span>
+          <h3>{recommendationCount} recommendations</h3>
+          <blockquote>“{quote.quote}”</blockquote>
+          <p class="proof__by">{quote.name}, {quote.role}</p>
+          <span class="proof__link">Read them on LinkedIn <Icon name="arrowUpRight" size={16} /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap"><ContactCta /></div>
+  </section>
+</Base>

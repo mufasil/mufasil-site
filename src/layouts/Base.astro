@@ -1,0 +1,223 @@
+---
+import "@fontsource-variable/inter/opsz.css";
+import "@fontsource-variable/geist-mono";
+import "@fontsource/instrument-serif/latin-400-italic.css";
+import "../styles/site.css";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url";
+import serifItalic from "@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url";
+import Seo from "../components/Seo.astro";
+import Icon from "../components/Icon.astro";
+import Logo from "../components/Logo.astro";
+import { SITE } from "../consts";
+import { coreServices, menuColumns, featuredService } from "../data/services";
+import { serviceHref } from "../data/servicePages";
+
+interface Props {
+  title: string;
+  description: string;
+  type?: "website" | "article" | "profile";
+  image?: string;
+  published?: Date;
+  updated?: Date;
+  schema?: Record<string, unknown>[];
+  noindex?: boolean;
+  tags?: string[];
+}
+
+const props = Astro.props;
+const path = Astro.url.pathname;
+const year = new Date().getFullYear();
+const links = [
+  { href: "/work/", label: "Work" },
+  { href: "/about/", label: "About" },
+  { href: "/blog/", label: "Writing" },
+  { href: "/resume/", label: "Resume" },
+];
+const isCurrent = (href: string) => path.startsWith(href);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifItalic} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name}, writing`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Seo {...props} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    {SITE.openToWork && (
+      <div class="announce">
+        <p><span class="announce__dot" aria-hidden="true"></span>{SITE.availability}</p>
+        <a href={SITE.cv} download>Download CV <Icon name="arrowRight" size={14} /></a>
+      </div>
+    )}
+
+    <header class="nav" data-nav>
+      <div class="wrap nav__row">
+        <a class="logo" href="/" aria-label="Mufasil Iqbal, home"><Logo /></a>
+
+        <nav class="nav__links" aria-label="Main">
+          <noscript><a class="nav__link" href="/services/">Services</a></noscript>
+          <div class="mega" data-mega>
+            <button class="nav__link mega__toggle" type="button" aria-expanded="false" aria-controls="mega-panel">
+              Services <Icon name="chevron" size={14} />
+            </button>
+            <div class="mega__panel" id="mega-panel" hidden>
+              <div class="mega__left">
+                <p class="mega__label">Core services</p>
+                <div class="mega__core">
+                  {coreServices.map((s) => (
+                    <a class="mega__item" href={`/services/${s.slug}/`}>
+                      <span class="mega__title"><Icon name={s.icon} size={18} />{s.title}</span>
+                      <span class="mega__text">{s.text}</span>
+                    </a>
+                  ))}
+                </div>
+                <a class="mega__feature" href={`/services/${featuredService.slug}/`}>
+                  <span class="mega__feature-top"><b>{featuredService.title}</b><span class="mega__badge">{featuredService.badge}</span></span>
+                  <span class="mega__text">{featuredService.text}</span>
+                  <span class="mega__feature-arrow"><Icon name="arrowUpRight" size={18} /></span>
+                </a>
+              </div>
+              <div class="mega__right">
+                {menuColumns.map((g) => (
+                  <div class="mega__col">
+                    <p class="mega__label">{g.title}</p>
+                    {g.items.map((item) => <a href={serviceHref(item)}>{item}</a>)}
+                  </div>
+                ))}
+                <a class="mega__all" href="/services/">See all 19 services <Icon name="arrowRight" size={16} /></a>
+              </div>
+            </div>
+          </div>
+          {links.map((l) => (
+            <a class="nav__link" href={l.href} aria-current={isCurrent(l.href) ? "page" : undefined}>{l.label}</a>
+          ))}
+        </nav>
+
+        <div class="nav__actions">
+          <a class="btn btn--pill btn--dark nav__cta" href="/contact/">
+            Contact me <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span>
+          </a>
+          <details class="menu">
+            <summary class="icon-btn" aria-label="Open menu"><Icon name="menu" size={20} /></summary>
+            <div class="menu__panel">
+              <a href="/services/">Services</a>
+              {links.map((l) => <a href={l.href}>{l.label}</a>)}
+              <a href="/contact/">Contact me</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer__top">
+        <a class="logo logo--lg" href="/" aria-label="Mufasil Iqbal, home"><Logo /></a>
+        <p>Senior backend engineer and tech lead in Karachi, working remotely on Node.js, NestJS and AWS.</p>
+      </div>
+      <div class="wrap footer__grid">
+        <div class="footer__col">
+          <p class="footer__label">Based in</p>
+          <p>Karachi, Pakistan<br />Remote worldwide</p>
+          <p class="footer__label">Local time</p>
+          <p class="mono" data-clock>UTC+5</p>
+          <p class="footer__label">Drop a line</p>
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__label">Core services</p>
+          {coreServices.map((s) => <a href={`/services/${s.slug}/`}>{s.title}</a>)}
+        </div>
+        <div class="footer__col">
+          <p class="footer__label">Pages</p>
+          <a href="/services/">Services</a>
+          {links.map((l) => <a href={l.href}>{l.label}</a>)}
+          <a href="/contact/">Contact</a>
+        </div>
+        <div class="footer__col">
+          <p class="footer__label">Elsewhere</p>
+          <a href={SITE.linkedin} rel="me">LinkedIn</a>
+          <a href={SITE.credly}>AWS badge on Credly</a>
+          <a href={SITE.cv} download>Download CV</a>
+          <a href="/rss.xml">RSS feed</a>
+        </div>
+      </div>
+      <div class="wrap footer__badges">
+        <span class="badge"><Icon name="award" size={16} />AWS Certified Solutions Architect</span>
+        <span class="badge"><Icon name="users" size={16} />14 recommendations on LinkedIn</span>
+        <span class="badge"><Icon name="code" size={16} />Shipping backends since 2014</span>
+      </div>
+      <div class="wrap footer__legal">
+        <p>&copy; {year} Mufasil Iqbal</p>
+        <p>Designed and built in Karachi</p>
+      </div>
+    </footer>
+
+    <script>
+      import "../scripts/core";
+
+      // Services mega menu: opens on hover for a mouse, on click or keyboard for everyone.
+      const mega = document.querySelector<HTMLElement>("[data-mega]");
+      const toggle = mega?.querySelector<HTMLButtonElement>(".mega__toggle");
+      const panel = mega?.querySelector<HTMLElement>(".mega__panel");
+      if (mega && toggle && panel) {
+        let timer: number | undefined;
+        const open = (v: boolean) => {
+          toggle.setAttribute("aria-expanded", String(v));
+          panel.hidden = !v;
+          mega.classList.toggle("is-open", v);
+        };
+        toggle.addEventListener("click", () => open(panel.hidden));
+        mega.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { clearTimeout(timer); open(true); } });
+        mega.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") timer = window.setTimeout(() => open(false), 160); });
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { open(false); toggle.focus(); } });
+        document.addEventListener("click", (e) => { if (!mega.contains(e.target as Node)) open(false); });
+      }
+
+      // Phone menu closes when tapping outside it.
+      const menu = document.querySelector<HTMLDetailsElement>(".menu");
+      document.addEventListener("click", (e) => { if (menu?.open && !menu.contains(e.target as Node)) menu.open = false; });
+
+
+      // Karachi local time in the footer.
+      const clocks = document.querySelectorAll<HTMLElement>("[data-clock]");
+      if (clocks.length) {
+        const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Karachi" });
+        const tick = () => {
+          const now = fmt.format(new Date());
+          clocks.forEach((c) => (c.textContent = c.dataset.clock === "short" ? `${now} in Karachi` : `${now} in Karachi, UTC+5`));
+        };
+        tick();
+        setInterval(tick, 30000);
+      }
+
+      // Copy-to-clipboard buttons.
+      document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(btn.dataset.copy || "");
+            const text = btn.querySelector("[data-copy-label]");
+            const original = text?.textContent ?? "";
+            btn.classList.add("is-copied");
+            if (text) text.textContent = "Copied";
+            setTimeout(() => { btn.classList.remove("is-copied"); if (text) text.textContent = original; }, 1800);
+          } catch (e) {}
+        });
+      });
+    </script>
+  </body>
+</html>

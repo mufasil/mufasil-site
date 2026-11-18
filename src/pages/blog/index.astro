@@ -1,0 +1,70 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { SITE } from "../../consts";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import ContactCta from "../../components/ContactCta.astro";
+
+const posts = (await getCollection("blog")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+const minutes = (body = "") => Math.max(1, Math.round(body.split(/\s+/).filter(Boolean).length / 220));
+const topics = [...new Set(posts.flatMap((p) => p.data.tags))];
+const [featured, ...rest] = posts;
+
+const schema = [
+  {
+    "@type": "Blog",
+    "@id": `${SITE.url}/blog/#blog`,
+    url: `${SITE.url}/blog/`,
+    name: "Writing by Mufasil Iqbal",
+    author: { "@id": `${SITE.url}/#person` },
+    blogPost: posts.map((p) => ({ "@type": "BlogPosting", headline: p.data.title, url: `${SITE.url}/blog/${p.id}/`, datePublished: p.data.pubDate.toISOString() })),
+  },
+];
+---
+<Base
+  title="Notes on Node.js, AWS and AI-built Apps"
+  description="Practical notes from Mufasil Iqbal on taking AI-built apps to production, fixing Node.js problems behind AWS, and keeping an AWS bill under control."
+  schema={schema}
+>
+  <PageHero kicker="Writing" title="Notes from" accent="production." lead="Fixes for AI-built apps, Node.js and AWS, written so you can use them today.">
+    <div class="phero__actions">
+      <a class="btn" href="/rss.xml"><Icon name="rss" size={18} />Follow by RSS</a>
+    </div>
+    <ul class="tags tags--hero" aria-label="Topics">{topics.map((t) => <li>{t}</li>)}</ul>
+  </PageHero>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      {featured && (
+        <a class="feature" href={`/blog/${featured.id}/`} data-reveal>
+          <div class="feature__body">
+            <p class="post-meta"><span class="post-meta__new">Latest</span><time datetime={featured.data.pubDate.toISOString()}>{fmt(featured.data.pubDate)}</time><span>{minutes(featured.body)} min read</span></p>
+            <h2>{featured.data.title}</h2>
+            <p>{featured.data.description}</p>
+            <span class="case__cta">Read the note <span class="case__arrow"><Icon name="arrowUpRight" size={18} /></span></span>
+          </div>
+          <ul class="feature__tags tags">{featured.data.tags.map((t) => <li>{t}</li>)}</ul>
+        </a>
+      )}
+      <div class="notes">
+        {rest.map((post) => (
+          <a class="note" href={`/blog/${post.id}/`} data-reveal>
+            <p class="post-meta"><time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time><span>{minutes(post.body)} min read</span></p>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <div class="note__foot">
+              <ul class="tags">{post.data.tags.slice(0, 3).map((t) => <li>{t}</li>)}</ul>
+              <span class="case__arrow"><Icon name="arrowUpRight" size={18} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap"><ContactCta heading="Need one of these fixed on your app?" text="Send me what you’re seeing and where it runs. I reply by email." /></div>
+  </section>
+</Base>

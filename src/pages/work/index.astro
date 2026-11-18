@@ -1,0 +1,94 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { projects } from "../../data/projects";
+import { SITE } from "../../consts";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import ContactCta from "../../components/ContactCta.astro";
+import { lookFor } from "../../data/cases";
+import { experience, earlier } from "../../data/experience";
+
+const cases = (await getCollection("work")).sort((a, b) => a.data.order - b.data.order);
+
+const schema = [
+  {
+    "@type": "CollectionPage",
+    "@id": `${SITE.url}/work/#page`,
+    url: `${SITE.url}/work/`,
+    name: "Work by Mufasil Iqbal",
+    hasPart: cases.map((c) => ({ "@type": "Article", headline: c.data.title, url: `${SITE.url}/work/${c.id}/` })),
+  },
+];
+---
+<Base
+  title="Case Studies and Backend Projects"
+  description="Case studies by Mufasil Iqbal, including a product 1.5 years late shipped in four months, a multi-tenant childcare SaaS and a Hilal Foods loyalty engine."
+  schema={schema}
+>
+  <PageHero kicker="Work" title="Eleven years of backends," accent="in short." lead="Three projects told in full, and the rest in a line each.">
+    <ul class="facts">
+      <li><Icon name="file" size={16} />{cases.length} case studies</li>
+      <li><Icon name="layers" size={16} />{projects.length} projects listed</li>
+      <li><Icon name="briefcase" size={16} />{experience.length + earlier.length} companies since 2014</li>
+    </ul>
+  </PageHero>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Case studies</p>
+        <h2>Three projects in detail</h2>
+      </div>
+      <div class="cases">
+        {cases.map((c, i) => {
+          const look = lookFor(c.id);
+          return (
+            <a class={`case case--${look.tone}`} href={`/work/${c.id}/`} data-reveal>
+              <div class="case__body">
+                <p class="case__meta"><span>{String(i + 1).padStart(2, "0")}</span>{c.data.client}, {c.data.years}</p>
+                <h3>{c.data.title}</h3>
+                <p>{c.data.description}</p>
+                <ul class="tags">{c.data.stack.slice(0, 4).map((s) => <li>{s}</li>)}</ul>
+                <span class="case__cta">Read the case study <span class="case__arrow"><Icon name="arrowUpRight" size={18} /></span></span>
+              </div>
+              <div class="case__metric">
+                <b>{look.value}</b>
+                <span>{look.label}</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--band">
+    <div class="wrap">
+      <div class="section__head" data-reveal>
+        <p class="kicker">Everything else</p>
+        <h2>Other projects</h2>
+      </div>
+      <div class="ledger" data-reveal>
+        <table class="table">
+          <caption class="visually-hidden">All projects, with client, years and stack</caption>
+          <thead><tr><th scope="col">Project</th><th scope="col">For</th><th scope="col">Years</th><th scope="col">Stack or team</th></tr></thead>
+          <tbody>
+            {projects.map((p) => (
+              <tr>
+                <th scope="row">{p.slug ? <a href={`/work/${p.slug}/`}>{p.name} <Icon name="arrowUpRight" size={14} /></a> : p.name}</th>
+                <td>{p.client}</td>
+                <td class="num">{p.years}</td>
+                <td>{p.stack}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap"><ContactCta heading="Have a backend that needs this kind of work?" /></div>
+  </section>
+</Base>

@@ -1,0 +1,151 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { SITE } from "../consts";
+import PageHero from "../components/PageHero.astro";
+
+// The form posts to the small Node service in server/, which nginx serves at /api/contact.
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? "/api/contact";
+const schema = [
+  { "@type": "ContactPage", "@id": `${SITE.url}/contact/#page`, url: `${SITE.url}/contact/`, name: "Contact Mufasil Iqbal", mainEntity: { "@id": `${SITE.url}/#person` } },
+];
+const types = [
+  { id: "role", label: "A full-time role" },
+  { id: "contract", label: "A contract" },
+  { id: "consulting", label: "Consulting or a review" },
+  { id: "other", label: "Something else" },
+];
+---
+<Base
+  title="Contact a Remote Node.js Backend Engineer"
+  description="Contact Mufasil Iqbal about a remote backend or tech lead role, a contract, or consulting. Write by email, on LinkedIn or through the form on this page."
+  schema={schema}
+>
+  <PageHero kicker="Contact" title="Let’s talk about your" accent="role or project." lead="Tell me what you’re hiring for or building. I reply by email.">
+    {SITE.openToWork && <p class="status-pill"><span class="door__pulse" aria-hidden="true"></span>{SITE.availability}</p>}
+  </PageHero>
+
+  <div class="wrap contact">
+    <div class="contact__list">
+      <div class="contact__item contact__item--mail">
+        <span class="glossy"><Icon name="mail" size={20} stroke={1.75} /></span>
+        <span><small>Email</small><a href={`mailto:${SITE.email}`}><b>{SITE.email}</b></a></span>
+        <button class="btn btn--sm" type="button" data-copy={SITE.email}><Icon name="copy" size={14} /><span data-copy-label>Copy</span></button>
+      </div>
+      <a class="contact__item" href={SITE.linkedin} rel="me">
+        <span class="glossy"><Icon name="linkedin" size={18} /></span>
+        <span><small>LinkedIn</small><b>linkedin.com/in/mufasil</b></span>
+        <Icon name="arrowUpRight" size={18} class="contact__go" />
+      </a>
+      <a class="contact__item" href={SITE.cv} download>
+        <span class="glossy"><Icon name="download" size={20} stroke={1.75} /></span>
+        <span><small>CV</small><b>Download the PDF</b></span>
+        <Icon name="arrowRight" size={18} class="contact__go contact__go--down" />
+      </a>
+      <div class="contact__item">
+        <span class="glossy"><Icon name="clock" size={20} stroke={1.75} /></span>
+        <span><small>Local time</small><b data-clock>Karachi, UTC+5</b></span>
+      </div>
+    </div>
+
+    <form class="form" id="contact-form" data-endpoint={endpoint} data-email={SITE.email} novalidate>
+      <div class="form__head">
+        <h2>Send a message</h2>
+        <p>Every field except the link is required.</p>
+      </div>
+      <fieldset class="seg">
+        <legend>What’s this about?</legend>
+        {types.map((t, i) => (
+          <>
+            <input type="radio" name="type" id={`type-${t.id}`} value={t.label} checked={i === 0} />
+            <label for={`type-${t.id}`}>{t.label}</label>
+          </>
+        ))}
+      </fieldset>
+      <div class="field-pair">
+        <div class="field-row">
+          <label for="name">Your name</label>
+          <input class="input" id="name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field-row">
+          <label for="email">Your email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="email" inputmode="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" required />
+        </div>
+      </div>
+      <div class="field-row">
+        <label for="message">Message</label>
+        <textarea class="input" id="message" name="message" required aria-describedby="message-hint"></textarea>
+        <p class="hint" id="message-hint">The role or the project, the stack, and when you need someone.</p>
+      </div>
+      <div class="field-row">
+        <label for="link">Job post, repo or app link <span class="hint">(optional)</span></label>
+        <input class="input" id="link" name="link" type="url" inputmode="url" placeholder="https://" />
+      </div>
+      <!-- Bot trap. The name is deliberately meaningless so browser autofill never fills it. -->
+      <div class="hp" aria-hidden="true">
+        <label for="mi_trap_7">Do not fill this in</label>
+        <input id="mi_trap_7" name="mi_trap_7" type="text" tabindex="-1" autocomplete="off" data-lpignore="true" data-1p-ignore />
+      </div>
+      <div class="form__actions">
+        <button class="btn btn--pill btn--primary" type="submit">Send message <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></button>
+      </div>
+      <p class="form__help" id="form-help" aria-live="polite"></p>
+    </form>
+  </div>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("#contact-form");
+  if (form) {
+    const preset = new URLSearchParams(location.search).get("type");
+    const radio = preset ? form.querySelector<HTMLInputElement>(`#type-${preset}`) : null;
+    if (radio) radio.checked = true;
+
+    const help = form.querySelector<HTMLElement>("#form-help")!;
+    const button = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input.input, textarea"));
+      fields.forEach((f) => f.toggleAttribute("aria-invalid", !f.checkValidity()));
+      const firstBad = fields.find((f) => !f.checkValidity());
+      if (firstBad) {
+        help.textContent = firstBad.type === "email" ? "That email address looks incomplete. Write it as name@example.com." : "Please fill in your name, email and a short message.";
+        firstBad.focus();
+        return;
+      }
+      const data = new FormData(form);
+      const endpoint = form.dataset.endpoint;
+      if (!endpoint) {
+        const subject = `${data.get("type")}: message from ${data.get("name")}`;
+        const body = `${data.get("message")}\n\nLink: ${data.get("link") || "none"}\n\nReply to: ${data.get("email")}`;
+        help.textContent = `Your email app should open with this message. If nothing opens, write to ${form.dataset.email}.`;
+        window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        return;
+      }
+      button.setAttribute("aria-busy", "true");
+      button.disabled = true;
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          body: JSON.stringify(Object.fromEntries(data)),
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+        });
+        if (res.ok) {
+          help.textContent = `Sent. I’ll reply to ${String(data.get("email")).trim()}.`;
+          form.reset();
+        } else if (res.status === 429) {
+          help.textContent = `You’ve sent a few messages already. Try again in a little while, or email ${form.dataset.email}.`;
+        } else if (res.status === 400) {
+          help.textContent = "Something in the form doesn’t look right. Check your email address and the link, then try again.";
+        } else {
+          help.textContent = `That didn’t go through. Try again in a minute, or email ${form.dataset.email}.`;
+        }
+      } catch {
+        help.textContent = `That didn’t go through. Try again in a minute, or email ${form.dataset.email}.`;
+      } finally {
+        button.removeAttribute("aria-busy");
+        button.disabled = false;
+      }
+    });
+  }
+</script>

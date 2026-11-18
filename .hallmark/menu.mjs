@@ -1,0 +1,12 @@
+import puppeteer from "puppeteer-core";
+const [url, out] = process.argv.slice(2);
+const b = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true });
+const p = await b.newPage();
+await p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+await p.goto(url, { waitUntil: "networkidle0" });
+await new Promise((r) => setTimeout(r, 1500));
+await p.screenshot({ path: out.replace(".png", "-hero.png") });
+await p.hover(".mega__toggle");
+await new Promise((r) => setTimeout(r, 900));
+await p.screenshot({ path: out });
+await b.close();

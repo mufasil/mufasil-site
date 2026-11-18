@@ -1,0 +1,13 @@
+{
+  "name": "Mufasil Iqbal",
+  "short_name": "Mufasil",
+  "description": "Senior backend engineer and tech lead. Node.js, NestJS and AWS.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f6f8fc",
+  "theme_color": "#f6f8fc",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

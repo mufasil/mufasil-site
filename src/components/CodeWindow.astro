@@ -1,0 +1,83 @@
+---
+// One route handler as an AI tool wrote it, and as it shipped. Lines are pre-tokenised
+// so the page needs no syntax highlighter.
+type Line = { html: string; added?: boolean; mark?: number };
+
+const k = (s: string) => `<span class="tk-k">${s}</span>`;
+const str = (s: string) => `<span class="tk-s">${s}</span>`;
+const f = (s: string) => `<span class="tk-f">${s}</span>`;
+const n = (s: string) => `<span class="tk-n">${s}</span>`;
+
+const before: Line[] = [
+  { html: `${k("import")} { db } ${k("from")} ${str('"@/lib/db"')};` },
+  { html: "" },
+  { html: `${k("export async function")} ${f("GET")}() {` },
+  { html: `  ${k("const")} invoices = ${k("await")} db.invoice.${f("findMany")}();` },
+  { html: `  ${k("return")} Response.${f("json")}(invoices);` },
+  { html: "}" },
+];
+
+const after: Line[] = [
+  { html: `${k("import")} { db } ${k("from")} ${str('"@/lib/db"')};` },
+  { html: `${k("import")} { auth } ${k("from")} ${str('"@/lib/auth"')};`, added: true, mark: 1 },
+  { html: "" },
+  { html: `${k("export async function")} ${f("GET")}() {` },
+  { html: `  ${k("const")} session = ${k("await")} ${f("auth")}();`, added: true },
+  { html: `  ${k("if")} (!session) {`, added: true },
+  { html: `    ${k("return new")} ${f("Response")}(${k("null")}, { status: ${n("401")} });`, added: true },
+  { html: "  }", added: true },
+  { html: `  ${k("const")} invoices = ${k("await")} db.invoice.${f("findMany")}({` },
+  { html: `    where: { orgId: session.orgId },`, added: true, mark: 2 },
+  { html: `    take: ${n("50")},`, added: true, mark: 3 },
+  { html: "  });" },
+  { html: `  ${k("return")} Response.${f("json")}(invoices);` },
+  { html: "}" },
+];
+
+const notes = [
+  "Signed-out callers get a 401 instead of the data.",
+  "Each customer sees only their own organisation’s invoices.",
+  "No single request can pull the whole table.",
+];
+---
+<figure class="code" data-code-window>
+  <div class="code__tabs" role="tablist" aria-label="The same route, two versions">
+    <button class="code__tab" type="button" role="tab" id="tab-after" aria-controls="panel-after" aria-selected="true">route.ts, before launch</button>
+    <button class="code__tab" type="button" role="tab" id="tab-before" aria-controls="panel-before" aria-selected="false" tabindex="-1">route.ts, as generated</button>
+  </div>
+  <div id="panel-after" role="tabpanel" aria-labelledby="tab-after">
+    <pre class="code__panel"><code>{after.map((l, i) => (
+      <span class:list={["ln", { "ln--added": l.added }]}><span class="ln__no">{i + 1}</span><span class="ln__code" set:html={l.html || " "} /><span class="ln__mark">{l.mark ?? ""}</span></span>
+    ))}</code></pre>
+    <ol class="code__notes">{notes.map((note) => <li>{note}</li>)}</ol>
+  </div>
+  <div id="panel-before" role="tabpanel" aria-labelledby="tab-before" data-default-hidden>
+    <pre class="code__panel"><code>{before.map((l, i) => (
+      <span class="ln"><span class="ln__no">{i + 1}</span><span class="ln__code" set:html={l.html || " "} /><span class="ln__mark"></span></span>
+    ))}</code></pre>
+  </div>
+  <figcaption class="visually-hidden">A Next.js route handler as an AI tool generated it, and the version that shipped with an auth check, tenant scoping and a page size.</figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-code-window]").forEach((win) => {
+    const tabs = Array.from(win.querySelectorAll<HTMLButtonElement>("[role=tab]"));
+    const panels = tabs.map((t) => win.querySelector<HTMLElement>(`#${t.getAttribute("aria-controls")}`)!);
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        t.setAttribute("aria-selected", String(i === j));
+        t.tabIndex = i === j ? 0 : -1;
+        panels[j].hidden = i !== j;
+      });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(i));
+      t.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") select((i + 1) % tabs.length, true);
+        if (e.key === "ArrowLeft") select((i - 1 + tabs.length) % tabs.length, true);
+      });
+    });
+    select(0);
+  });
+</script>

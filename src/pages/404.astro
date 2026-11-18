@@ -1,0 +1,28 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+
+const ways = [
+  { href: "/", icon: "home", label: "Home", text: "Start from the top" },
+  { href: "/work/", icon: "layers", label: "Work", text: "Case studies and projects" },
+  { href: "/blog/", icon: "penLine", label: "Writing", text: "Notes from production" },
+  { href: "/contact/", icon: "mail", label: "Contact", text: "Ask me directly" },
+];
+---
+<Base title="Page not found" description="This page doesn’t exist on mufasil.site." noindex>
+  <section class="lost">
+    <div class="wrap lost__grid">
+      <div class="lost__copy" data-hero style="--d:0s">
+        <p class="lost__code" aria-hidden="true">404</p>
+        <h1>That page isn’t here.</h1>
+        <p class="lead">It may have moved when the site was rebuilt. One of these should get you where you were going.</p>
+        <a class="btn btn--pill btn--dark" href="/">Go to the home page <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+      </div>
+      <ul class="lost__ways" data-hero style="--d:.12s">
+        {ways.map((w) => (
+          <li><a href={w.href}><span class="glossy"><Icon name={w.icon} size={20} stroke={1.75} /></span><span><b>{w.label}</b><small>{w.text}</small></span><Icon name="arrowRight" size={18} /></a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>

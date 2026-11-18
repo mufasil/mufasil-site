@@ -1,0 +1,15 @@
+---
+// Mufasil's photo as a bust in a sphere: the lower half is clipped to the circle, the head rises above it.
+// The parent sets --orb (the sphere's diameter); anything passed as children floats around it.
+import { Image } from "astro:assets";
+import cutout from "../assets/mufasil-cutout.png";
+interface Props { class?: string; sizes?: string; eager?: boolean }
+const { class: className, sizes = "(min-width: 1375px) 413px, (min-width: 917px) 30vw, 275px", eager = true } = Astro.props;
+---
+<div class:list={["figure", className]} data-tilt-zone>
+  <div class="figure__orb" aria-hidden="true"></div>
+  <div class="figure__photo">
+    <Image src={cutout} alt="Mufasil Iqbal" widths={[400, 600, 800, 1000, 1215]} sizes={sizes} quality={90} loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : "auto"} />
+  </div>
+  <slot />
+</div>

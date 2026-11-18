@@ -1,0 +1,81 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { experience } from "../data/experience";
+import { SITE, yearsBuilding } from "../consts";
+import PageHero from "../components/PageHero.astro";
+
+const years = yearsBuilding();
+const earlierRoles = [
+  { role: "Senior Software Engineer", company: "EPlanet Communication", when: "Feb 2021 to Aug 2021", points: ["Delivered custom e-commerce builds, including a 3D glove customiser.", "Mentored two to three junior developers."] },
+  { role: "Senior Software Engineer", company: "Nanosoft Technologies", when: "Feb 2021 to Aug 2021", points: ["Built a dynamic form builder with nested conditional logic.", "Fixed critical bugs in the TaskQue product and advised clients on architecture."] },
+  { role: "Software Engineer", company: "Hashlob", when: "Sep 2018 to Oct 2019", points: ["Built custom software from workflow and data analysis, with full documentation."] },
+  { role: "Software Engineer", company: "Lakson Business Solutions", when: "Mar 2018 to Sep 2019", points: ["Built features for the Storm Fiber and National Broadband portals, with stored procedures, schedulers and triggers."] },
+  { role: "Software Engineer", company: "Synage Global", when: "Feb 2017 to Feb 2018", points: ["Built production software across the full lifecycle, including specs and QA."] },
+  { role: "Software Engineer", company: "Interactive Cells", when: "Jun 2015 to Feb 2017", points: ["Worked on projects for Hilal Foods, Jubilee Insurance and Getz Pharma, including real-time features over WebSockets."] },
+  { role: "Web Developer", company: "Evolution Designers", when: "Dec 2014 to Jun 2015", points: ["Built WordPress sites, PayPal and Stripe integrations, and CMS migrations."] },
+];
+---
+<Base
+  title="Resume, Senior Backend Engineer and Tech Lead"
+  description="Resume of Mufasil Iqbal, senior backend engineer and Technical Team Lead, with 11+ years of Node.js, NestJS, PHP, Python and AWS, and a team of 19+ led."
+  type="profile"
+>
+  <PageHero kicker="Resume" title="The full history," accent="on one page." lead="Download it as a PDF, or print this page.">
+    <div class="phero__actions">
+      <a class="btn btn--pill btn--primary" href={SITE.cv} download>Download PDF <span class="btn__dot"><Icon name="download" size={14} /></span></a>
+      <button class="btn" type="button" onclick="window.print()"><Icon name="file" size={16} />Print this page</button>
+    </div>
+  </PageHero>
+
+  <section class="resume">
+    <div class="wrap">
+      <article class="card resume__paper">
+        <header class="resume__top">
+          <div>
+            <p class="resume__name">Mufasil Iqbal</p>
+            <p>Senior Backend Engineer and Technical Team Lead</p>
+          </div>
+          <div class="resume__contact">
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            <a href={SITE.linkedin}>linkedin.com/in/mufasil</a>
+            <a href={SITE.url}>mufasil.site</a>
+            <span>Karachi, Pakistan, UTC+5, open to remote</span>
+          </div>
+        </header>
+
+        <h2>Summary</h2>
+        <p class="resume__summary">Backend engineer and technical leader with {years}+ years in Node.js, NestJS, PHP and Python, on PostgreSQL, MySQL, MongoDB and Redis, deployed on AWS. Leads an AI-first engineering team where AI writes the boilerplate and engineers own the architecture. Led a cross-functional team of 19+ and shipped a product that was 1.5 years late within four months. AWS Certified Solutions Architect, Associate.</p>
+
+        <h2>Experience</h2>
+        {experience.map((job) => (
+          <div class="resume__job">
+            <div class="resume__jobtop"><h3>{job.role}, <span class="resume__company">{job.company}</span></h3><span>{job.start} to {job.end}</span></div>
+            <ul>{job.points.map((p) => <li>{p}</li>)}</ul>
+          </div>
+        ))}
+        {earlierRoles.map((job) => (
+          <div class="resume__job">
+            <div class="resume__jobtop"><h3>{job.role}, <span class="resume__company">{job.company}</span></h3><span>{job.when}</span></div>
+            <ul>{job.points.map((p) => <li>{p}</li>)}</ul>
+          </div>
+        ))}
+
+        <h2>Skills</h2>
+        <div class="resume__skills">
+          <p><b>Backend:</b> Node.js, NestJS, Express, TypeScript, Laravel, PHP, Python, Django, FastAPI, REST, GraphQL, WebSockets</p>
+          <p><b>Data:</b> PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch, pgvector</p>
+          <p><b>Cloud and delivery:</b> AWS (EC2, ECS, S3, RDS, Lambda), Docker, Kubernetes, GitHub Actions, CI/CD, Linux</p>
+          <p><b>AI:</b> Claude Code, Cursor, GitHub Copilot, OpenAI and Anthropic APIs, RAG, MCP</p>
+          <p><b>Leadership:</b> leading teams, Agile delivery, code review, mentoring, architecture (DDD, multi-tenant, microservices)</p>
+        </div>
+
+        <h2>Certification and education</h2>
+        <div class="resume__skills">
+          <p><b>AWS Certified Solutions Architect, Associate</b>, Sep 2025 to Sep 2028</p>
+          <p><b>Bachelor of Computer Science</b>, Dadabhoy Institute of Higher Education, 2014 to 2018</p>
+        </div>
+      </article>
+    </div>
+  </section>
+</Base>

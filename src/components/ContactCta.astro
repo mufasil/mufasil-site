@@ -1,0 +1,31 @@
+---
+import Icon from "./Icon.astro";
+import { SITE } from "../consts";
+
+interface Props {
+  heading?: string;
+  text?: string;
+}
+const {
+  heading = "Hiring a backend engineer or tech lead?",
+  text = SITE.openToWork
+    ? "I’m open to remote roles and contract work. Send me the role or the project, and I’ll reply by email."
+    : "Send me the role or the project, and I’ll reply by email.",
+} = Astro.props;
+---
+<div class="cta" data-reveal>
+  <div class="cta__copy">
+    {SITE.openToWork && <p class="cta__status"><span class="door__pulse" aria-hidden="true"></span>{SITE.availability}</p>}
+    <h2>{heading}</h2>
+    <p>{text}</p>
+  </div>
+  <div class="cta__actions">
+    <a class="btn btn--pill btn--light" href="/contact/">Start a conversation <span class="btn__dot"><Icon name="arrowUpRight" size={14} /></span></a>
+    <div class="cta__row">
+      <button class="btn btn--ghost" type="button" data-copy={SITE.email}><Icon name="copy" size={16} /><span data-copy-label>Copy email</span></button>
+      <a class="btn btn--ghost" href={SITE.cv} download><Icon name="download" size={16} />CV</a>
+      <a class="btn btn--ghost" href={SITE.linkedin} rel="me"><Icon name="linkedin" size={16} />LinkedIn</a>
+    </div>
+    <a class="cta__mail" href={`mailto:${SITE.email}`}><Icon name="mail" size={16} />{SITE.email}</a>
+  </div>
+</div>
